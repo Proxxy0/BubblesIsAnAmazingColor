@@ -5,8 +5,11 @@
 
 const GRAVITY = -9.82;
 const WINDOW  = 50 //iirc 
+const beepInterval = 1;
 
 #include <iostream>
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
@@ -31,6 +34,29 @@ int main()
    int gap = 10;
    double alpha = 0.1;
    //THE STUFF
+
+   //TIMER----------------------------------------------------------
+   
+   clock_t startTime = clock(); //Start timer
+
+	clock_t testTime;
+	clock_t timePassed;
+	double secondsPassed;
+
+	while(true)
+	{
+		testTime = clock();
+		timePassed = startTime - testTime;
+		secondsPassed = timePassed / (double)CLOCKS_PER_SEC;
+
+		if(secondsPassed >= beepInterval)
+		{
+			//cout << secondsToDelay << "seconds have passed" << endl;
+			beep();
+		}
+	}
+//I've never done a timer before hopefully this is close
+
    //INITIALIZATION--------------------------------------------------
    for(int k=0;k=gap-1;k++){
       for(int i=0;i<threshhold;i++){
