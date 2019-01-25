@@ -2,180 +2,181 @@
 + + ++ ---=== >>>|xxoxx|> ...zoom
 */
 
-const double GRAVITY = -9.8;
-
+//##############################################################################
+//inclusions, constants and namespace
+//##############################################################################
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+#include <time.h>
+#include <math.h>
+
+const double GRAVITY = -9.8;
 
 using namespace std;
 
+//##############################################################################
+//classes
+//##############################################################################
 //class for 'altimeter' variable storage
 class Jimbo{
-    public: // placeholder until everything is put into functions
-    //private:
-    //Position, Velocity, and Acceleration values
-    double preH, curH, maxH;
-    double preV, curV, maxV;
-    double preA, curA, maxA;
+  private:
+  //Position, Velocity, and Acceleration values
+  double preH, curH, maxH;
+  double preV, curV, maxV;
+  double preA, curA, maxA;
 
-    //internal counter
-    int paulRevere = 0;
+  //internal counter
+  int counter = 0;
 
-    //placeholder for elapsed time
-    double dt;
+  //elapsed time
+  clock_t dt;
 
-    //second interval between arming beeps
-    const double beepInterval = 1;
+  //second interval between arming beeps
+  const double byap = 1;
 
-    //averaging window
-    const int ceiling = 100;
+  //averaging window
+  const int window = 100;
 
-    //averaging array
-    double Windows10[ceiling] = {0};
+  //averaging array
+  double avgArray[window] = {0};
 
-    //averages an array of points
-    double average(double *points, int numPnts);
+  //averages an array of points
+  double average(double *points, int numPnts);
 
-    //arming beeps
-    //void beep();
+  //arming beeps
+  void beep();
 
-    //updates the previous vel. and accl., and updates their respective values
-    // based on the change in height and velocity respectively
-    void setV();
-    void setA();
+  //updates the previous height, vel., accl., and updates their respective values
+  // based on average heights and the change in height and velocity respectively
+  void setH();
+  void setV();
+  void setA();
+
+  //appends a value, preferably the altimeter reading, to avgArray
+  void append(double);
+
+  //four is drogue; five is main
+  void fireDrogue();
+  void fireMain();
 
 
-    //public:
-    //updates the previous height, and sets the current height to input
+  public:
 
-    void append(double);
+  //appends a value to avgArray and updates H, V, and A
+  void updateAll();
 
-    void setH(double);
-
-    //class constructor and destructor
-    tinyTimb();
-    ~tinyTimb();
-
-    //returns the current height of the object
-    double getH();
+  //class constructor and destructor
+  Jimbo();
+  ~Jimbo();
 };
 
+//##############################################################################
+//class definitions
+//##############################################################################
 //averages an array of points
-double tinyTimb::average(double *points, int numPnts){
+double Jimbo::average(double *points, int numPnts){
   double mean;
   for(int i = 0; i<numPnts; i++){
     mean += points[i]/numPnts;
   }
 
   return mean;
+  dt = clock() - dt;
 }
 
 //unsure what to place here, so currently is used as a placeholder
-//void tinyTimb::beep(){ //beepu
+void Jimbo::beep(){ //beepu
 
-//}
-
-//uses the change in height over the change in time to compute the current velocity
-// whilst also updating the previous velocity. Similarly, checks to see if the
-// max velocity has increased.
-void tinyTimb::setV(){
-  preV = curV;
-  curV = (curH-preH)/dt;
-
-  if(maxV<curV){
-    maxV = curV;
-  }
 }
 
-
-//uses the change in velocity over the change in time to compute the current
-// acceleration whilst also updating the previous acceleration. Similarly, checks
-// to see if the max acceleration has increased.
-void tinyTimb::setA(){
-  preA = curA;
-  curA = (curV-preV)/dt;
-
-  if(maxA<curA){
-    maxA = curA
-  }
-}
-
-void tinyTimb::append(double newInput){
-  Windows10[paulRevere] = newInput;
-  paulRevere++;
-}
-
-//takes an input for the new current height as a parameter, and updates the
+//takes an average of heights for the new current height as a parameter, and updates the
 // current height and previous heights in measure. Similarly, checks to see if
 // the max height has increased.
-void tinyTimb::setH(double newH){
+void Jimbo::setH(){
   preH = curH;
-  curH = newH;
+  curH = average(avgArray, window);
 
   if(maxH<curH){
     maxH = curH;
   }
 }
 
+//uses the change in height over the change in time to compute the current velocity
+// whilst also updating the previous velocity. Similarly, checks to see if the
+// max velocity has increased.
+void Jimbo::setV(){
+  preV = curV;
+  curV = (curH-preH)/((float)dt/CLOCKS_PER_SEC);
+
+  if(maxV<curV){
+    maxV = curV;
+  }
+}
+
+//uses the change in velocity over the change in time to compute the current
+// acceleration whilst also updating the previous acceleration. Similarly, checks
+// to see if the max acceleration has increased.
+void Jimbo::setA(){
+  preA = curA;
+  curA = (curV-preV)/((float)dt/CLOCKS_PER_SEC);
+
+  if(maxA<curA){
+    maxA = curA
+  }
+}
+
+//appends an input to a circular array, avgArray
+void Jimbo::append(double newInput){
+  dt = clock();
+  avgArray[counter] = newInput;
+  counter++;
+}
+
+//fires drogue charge
+void Jimbo::fireDrogue(){
+  //turn pin attached to drogue charge to HIGH
+}
+
+//fire main charge
+void Jimbo::fireMain(){
+  //turn pin attached to main charge to HIGH
+}
+
+//appends a value to avgArray and updates H, V, and A;
+void Jimbo::updateAll();{
+  //append(alt reading);
+  setH();
+  setV();
+  setA();
+}
 
 // currently empty (possibly going to be parameterized). Will initialize height.
 // velocity, and acceleration.
-tinyTimb::tinyTimb(){
-  for(int i = 0; i<ceiling; i++){
+Jimbo::Jimbo(){
+  for(int i = 0; i<window; i++){
     //append(altimeter reading)
   }
-  //setH(average(Windows10, ceiling));
+  //setH();
   //append(alt read);
-  //setH(average(Windows10, ceiling));
+  //setH();
   //setV();
   //append(alt read);
-  //setH(average(Windows10, ceiling));
+  //setH();
   //setV();
   //setA();
 }
 
-//returns the current height of the object.
-double tinyTimb::getH(){
-  return curH;
-}
+//##############################################################################
+//main function
+//##############################################################################
+int main(){
+  clock_t globalTime;
+  Jimbo tonyTim;
 
-/*
-##################################################################
-psst. things get nasty(-er) after this point. you've been warned.
-##################################################################
-*/
+  while(true){
 
+  }
 
-int main()
-{
-    Jimbo tinyTimb;
-
-   //THE STUFF
-
-   //TIMER----------------------------------------------------------
-
-   clock_t startTime = clock(); //Start timer
-   clock_t testTime;
-   clock_t timePassed;
-   double secondsPassed;
-
-   while(true)
-   {
-     testTime = clock();
-     timePassed = startTime - testTime;
-     secondsPassed = timePassed / (double)CLOCKS_PER_SEC;
-
-     if(secondsPassed >= beepInterval)
-     {
-       //cout << secondsToDelay << "seconds have passed" << endl;
-       //beep();
-     }
-   }
-
-   //I've never done a timer before hopefully this is close
-
-
-   }
-   return 0;
+  globalTime = clock() - globalTime;
 }
