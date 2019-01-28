@@ -190,7 +190,7 @@ void Jimbo::fireDrogue(){
   int drogueT = clock() - totalT;
   wikiHow << "Drogue fired at time: " << (int)((drogueT/CLOCKS_PER_SEC)/60) << " minute(s) ";
   wikiHow << ((drogueT/CLOCKS_PER_SEC)%60) << " second(s)" << endl;
-  wikiHow << "Drogue fired at a height of: " << curH-initH << ";" << endl;
+  wikiHow << "Drogue fired at a height of: " << curH-initH << "m;" << endl;
   drogueFired = 1;
   droguePin->setval_gpio("1");
 }
@@ -201,7 +201,7 @@ void Jimbo::fireMain(){
   int mainT = clock() - totalT;
   wikiHow << "Main fired at time: " << (int)((mainT/CLOCKS_PER_SEC)/60) << " minute(s) ";
   wikiHow << ((mainT/CLOCKS_PER_SEC)%60) << " second(s)" << endl;
-  wikiHow << "Main fired at a height of: " << curH-initH << ";" << endl;
+  wikiHow << "Main fired at a height of: " << curH-initH << "m;" << endl;
   mainFired = 1;
   mainPin->setval_gpio("1");
 }
@@ -210,9 +210,9 @@ int Jimbo::endFlight(){
   totalT = clock() - totalT;
   wikiHow << "Total time elapsed: " << (int)((totalT/CLOCKS_PER_SEC)/60) << " minute(s)";
   wikiHow << ((totalT/CLOCKS_PER_SEC)%60) << " second(s);" << endl;
-  wikiHow << "Max height achieved: " << maxH << " (that's a lot!);" << endl;
-  wikiHow << "Max velocity achieved: " << maxV << " (woah, slow down there, Speed Racer);" << endl;
-  wikiHow << "Max acceleration achieved: " << maxA << " (I think my neck hurts);" << endl;
+  wikiHow << "Max height achieved: " << maxH << "m (that's a lot!);" << endl;
+  wikiHow << "Max velocity achieved: " << maxV << "m/s (woah, slow down there, Speed Racer);" << endl;
+  wikiHow << "Max acceleration achieved: " << maxA << "m/s/s (I think my neck hurts);" << endl;
   wikiHow.close()
 
   return 0;
@@ -308,7 +308,7 @@ Jimbo::Jimbo(){
   setH();
 
   initH = curH;
-  wikiHow << "Rocket starting at a height of: " << initH << ". All proceeding heights";
+  wikiHow << "Rocket starting at a height of: " << initH << "m. All proceeding heights";
   wikiHow << " will be adjusted accordingly.;" << endl;
 
   altimeterGather();
