@@ -16,6 +16,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "GPIOClass.h"
+#include <linux/i2c-dev.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
 
 const double GRAVITY = -9.8;
 const double METER_TO_FEET = 3.28084;
@@ -29,6 +32,21 @@ using namespace std;
 //class for 'altimeter' variable storage
 class Jimbo{
   private:
+
+  // I2C stuff
+  int file;
+  char *bus = "/dev/i2c-1";
+
+  char config[2] = {0};
+
+  char reg[1] = {0x00};
+	char data[6] = {0};
+
+  int tHeight, temp, pres;
+  float altitude, cTemp, fTemp, pressure;
+
+
+  //output file stream
   ofstream wikiHow;
 
   //Position, Velocity, and Acceleration values
@@ -90,6 +108,8 @@ class Jimbo{
   void fireMain();
 
   int endFlight();
+
+  void altimeterGather();
 
 
   public:
@@ -198,9 +218,59 @@ int Jimbo::endFlight(){
   return 0;
 }
 
+void Jimbo::altimeterGather(){
+  config[0] = 0x26;
+	config[1] = 0xB9;
+	write(file, config, 2);
+	// Select data configuration register(0x13)
+	// Data ready event enabled for altitude, pressure, temperature(0x07)
+	config[0] = 0x13;
+	config[1] = 0x07;
+	write(file, config, 2);
+	// Select control register(0x26)
+	// Active mode, OSR = 128, altimeter mode(0xB9)
+	config[0] = 0x26;
+	config[1] = 0xB9;
+	write(file, config, 2);
+	sleep(1);
+
+	// Read 6 bytes of data from address 0x00(00)
+	// status, tHeight msb1, tHeight msb, tHeight lsb, temp msb, temp lsb
+	reg[1] = {0x00};
+	write(file, reg, 1);
+	data[6] = {0};
+	read(file, data, 6)
+
+	// Convert the data
+	tHeight = ((data[1] * 65536) + (data[2] * 256 + (data[3] & 0xF0)) / 16);
+	temp = ((data[4] * 256) + (data[5] & 0xF0)) / 16;
+	altitude = tHeight / 16.0;
+	cTemp = (temp / 16.0);
+	fTemp = cTemp * 1.8 + 32;
+
+	// Select control register(0x26)
+	// Active mode, OSR = 128, barometer mode(0x39)
+	config[0] = 0x26;
+	config[1] = 0x39;
+	write(file, config, 2);
+	sleep(1);
+
+	// Read 4 bytes of data from register(0x00)
+	// status, pres msb1, pres msb, pres lsb
+	reg[0] = 0x00;
+	write(file, reg, 1);
+	read(file, data, 4);
+
+	// Convert the data to 20-bits
+	pres = ((data[1] * 65536) + (data[2] * 256 + (data[3] & 0xF0))) / 16;
+	pressure = (pres / 4.0) / 1000.0;
+}
+
 //appends a value to avgArray and updates H, V, and A;
 int Jimbo::updateAll();{
-  //append(alt reading);
+
+  altimeterGather();
+  append(altitude);
   setH();
   setV();
   setA();
@@ -227,8 +297,13 @@ Jimbo::Jimbo(){
   mainPin->export_gpio();
   droguePin->setdir_gpio("out");
   mainPin->setdir_gpio("out");
+
+	file = open(bus, O_RDWR);
+  ioctl(file, I2C_SLAVE, 0x60);
+
   for(int i = 0; i<window; i++){
-    //append(altimeter reading)
+    altimeterGather();
+    append(altitude);
   }
   setH();
 
@@ -236,10 +311,12 @@ Jimbo::Jimbo(){
   wikiHow << "Rocket starting at a height of: " << initH << ". All proceeding heights";
   wikiHow << " will be adjusted accordingly.;" << endl;
 
-  //append(alt read);
+  altimeterGather();
+  append(altitude);
   setH();
   setV();
-  //append(alt read);
+  altimeterGather();
+  append(altitude);
   setH();
   setV();
   setA();
