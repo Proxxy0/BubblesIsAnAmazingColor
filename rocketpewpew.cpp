@@ -48,6 +48,7 @@ class Jimbo{
 
   //output file stream
   ofstream wikiHow;
+  ofstream altimeterData;
 
   //Position, Velocity, and Acceleration values
   double preH, curH, maxH;
@@ -147,6 +148,7 @@ void Jimbo::beep(){ //beepu
 void Jimbo::setH(){
   preH = curH;
   curH = average(avgArray, window);
+  altimeter << curH << ", " << totalT-clock() << endl;
 
   if(maxH<curH){
     maxH = curH;
@@ -213,7 +215,9 @@ int Jimbo::endFlight(){
   wikiHow << "Max height achieved: " << maxH << "m (that's a lot!);" << endl;
   wikiHow << "Max velocity achieved: " << maxV << "m/s (woah, slow down there, Speed Racer);" << endl;
   wikiHow << "Max acceleration achieved: " << maxA << "m/s/s (I think my neck hurts);" << endl;
-  wikiHow.close()
+  wikiHow.close();
+  
+  altimeterData.close();
 
   return 0;
 }
@@ -293,6 +297,7 @@ int Jimbo::updateAll();{
 Jimbo::Jimbo(){
   totalT = clock();
   wikiHow.open("wikiHow.txt");
+  altimeterData.open("altimeterData.txt");
   droguePin->export_gpio();
   mainPin->export_gpio();
   droguePin->setdir_gpio("out");
