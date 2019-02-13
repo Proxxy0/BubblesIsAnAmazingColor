@@ -1,6 +1,3 @@
-​/* uh yeah lettuce and space buses
-+ + ++ ---=== >>>|xxoxx|> ...zoom
-*/
 
 //##############################################################################
 //inclusions, constants and namespace
@@ -10,7 +7,7 @@
 #include <cstdlib>
 #include <time.h>
 #include <math.h>
-#include <ofstream>
+#include <fstream>
 #include <unistd.h>
 #include <errno.h>
 #include <stdio.h>
@@ -51,9 +48,9 @@ class Jimbo{
   ofstream altimeterData;
 
   //Position, Velocity, and Acceleration values
-  double preH, curH, maxH;
-  double preV, curV, maxV;
-  double preA, curA, maxA;
+  double preH, curH, maxH = 0;
+  double preV, curV, maxV = 0;
+  double preA, curA, maxA = 0;
 
   //Initial height
   double initH;
@@ -80,7 +77,7 @@ class Jimbo{
   const double byap = 1;
 
   //averaging window
-  const int window = 100;
+  const static int window = 100;
 
   //averaging array
   double avgArray[window] = {0};
@@ -114,6 +111,8 @@ class Jimbo{
 
 
   public:
+  //returns elapsed time
+  double getTotTime();
 
   //appends a value to avgArray and updates H, V, and A
   int updateAll();
@@ -133,8 +132,8 @@ double Jimbo::average(double *points, int numPnts){
     mean += points[i]/numPnts;
   }
 
-  return mean;
   dt = clock() - dt;
+  return mean;
 }
 
 //unsure what to place here, so currently is used as a placeholder
@@ -148,7 +147,8 @@ void Jimbo::beep(){ //beepu
 void Jimbo::setH(){
   preH = curH;
   curH = average(avgArray, window);
-  altimeter << curH << ", " << totalT-clock() << endl;
+  //altimeterData << curH << ", " << (clock()-totalT)/CLOCKS_PER_SEC << endl;
+  cout << curH << ", " << ((double)(clock()-totalT))/CLOCKS_PER_SEC << ", " << clock() << ", " << totalT << ", " << clock()-totalT << endl;
 
   if(maxH<curH){
     maxH = curH;
@@ -175,7 +175,7 @@ void Jimbo::setA(){
   curA = (curV-preV)/((float)dt/CLOCKS_PER_SEC);
 
   if(maxA<curA){
-    maxA = curA
+    maxA = curA;
   }
 }
 
@@ -219,6 +219,11 @@ int Jimbo::endFlight(){
   
   altimeterData.close();
 
+  delete droguePin;
+  delete mainPin;
+  droguePin = NULL;
+  mainPin = NULL;
+
   return 0;
 }
 
@@ -236,14 +241,14 @@ void Jimbo::altimeterGather(){
 	config[0] = 0x26;
 	config[1] = 0xB9;
 	write(file, config, 2);
-	sleep(1);
+	//sleep(1);
 
 	// Read 6 bytes of data from address 0x00(00)
 	// status, tHeight msb1, tHeight msb, tHeight lsb, temp msb, temp lsb
 	reg[1] = {0x00};
 	write(file, reg, 1);
 	data[6] = {0};
-	read(file, data, 6)
+	read(file, data, 6);
 
 	// Convert the data
 	tHeight = ((data[1] * 65536) + (data[2] * 256 + (data[3] & 0xF0)) / 16);
@@ -257,7 +262,7 @@ void Jimbo::altimeterGather(){
 	config[0] = 0x26;
 	config[1] = 0x39;
 	write(file, config, 2);
-	sleep(1);
+	//sleep(1);
 
 	// Read 4 bytes of data from register(0x00)
 	// status, pres msb1, pres msb, pres lsb
@@ -270,8 +275,14 @@ void Jimbo::altimeterGather(){
 	pressure = (pres / 4.0) / 1000.0;
 }
 
+//returns the elapsed time
+double Jimbo::getTotTime(){
+  return (clock()-totalT)/CLOCKS_PER_SEC;
+}
+
+
 //appends a value to avgArray and updates H, V, and A;
-int Jimbo::updateAll();{
+int Jimbo::updateAll(){
 
   altimeterGather();
   append(altitude);
@@ -287,8 +298,8 @@ int Jimbo::updateAll();{
     fireMain();
   }
 
-  if((curH<=1.01*initH) && drogueFired && mainFired && abs(curV)<= 0.1 && abs(curA)<= 0.1){
-    return endFlight()
+  if((curH<=1.01*initH) && drogueFired && mainFired && (curV <= 0.1 && curV >= -0.1) && (curA <= 0.1 && curA >= -0.1)){
+    return endFlight();
   }
 }
 
@@ -298,12 +309,14 @@ Jimbo::Jimbo(){
   totalT = clock();
   wikiHow.open("wikiHow.txt");
   altimeterData.open("altimeterData.txt");
-  droguePin->export_gpio();
-  mainPin->export_gpio();
+  //droguePin->export_gpio(); // not needed with GPIOClass_v2
+  //mainPin->export_gpio(); // not needed with GPIOClass_v2
+  cout << "I'm here!" << endl;
   droguePin->setdir_gpio("out");
   mainPin->setdir_gpio("out");
-
-	file = open(bus, O_RDWR);
+  cout << "Now I'm here!" << endl;
+  
+  file = open(bus, O_RDWR);
   ioctl(file, I2C_SLAVE, 0x60);
 
   for(int i = 0; i<window; i++){
@@ -327,13 +340,18 @@ Jimbo::Jimbo(){
   setA();
 }
 
+Jimbo::~Jimbo(){}
+
 //##############################################################################
 //main function
 //##############################################################################
 int main(){
   Jimbo tonyTim;
-
-  while(true){
-    updateAll();
+  cout << "initialization complete!" << endl;
+  
+  //run for 10 seconds
+  while(tonyTim.getTotTime() < 10){
+    tonyTim.updateAll();
   }
+  return 0;
 }
