@@ -65,6 +65,7 @@ class Jimbo{
   //boolean to determine if the drogue 'chute has fired.
   bool drogueFired = 0;
   bool mainFired = 0;
+  
 
   //internal counter
   int counter = 0;
@@ -114,8 +115,11 @@ class Jimbo{
   //returns elapsed time
   double getTotTime();
 
+  //boolean to determine if the rocket has "landed"
+  bool landed = 0;
+
   //appends a value to avgArray and updates H, V, and A
-  int updateAll();
+  void updateAll();
 
   //class constructor and destructor
   Jimbo();
@@ -147,8 +151,8 @@ void Jimbo::beep(){ //beepu
 void Jimbo::setH(){
   preH = curH;
   curH = average(avgArray, window);
-  //altimeterData << curH << ", " << (clock()-totalT)/CLOCKS_PER_SEC << endl;
-  cout << curH << ", " << ((double)(clock()-totalT))/CLOCKS_PER_SEC << ", " << clock() << ", " << totalT << ", " << clock()-totalT << endl;
+  //altimeterData << curH << ", " << getTotTime() << endl;
+  cout << curH << ", " << getTotTime() << ", " << clock() << ", " << totalT << ", " << clock()-totalT << endl;
 
   if(maxH<curH){
     maxH = curH;
@@ -190,8 +194,8 @@ void Jimbo::append(double newInput){
 void Jimbo::fireDrogue(){
   //turn pin attached to drogue charge to HIGH
   int drogueT = clock() - totalT;
-  wikiHow << "Drogue fired at time: " << (int)((drogueT/CLOCKS_PER_SEC)/60) << " minute(s) ";
-  wikiHow << ((drogueT/CLOCKS_PER_SEC)%60) << " second(s)" << endl;
+  wikiHow << "Drogue fired at time: " << (int)(((double)drogueT/CLOCKS_PER_SEC)/60) << " minute(s) ";
+  wikiHow << ((int)((double)drogueT/CLOCKS_PER_SEC)%60) << " second(s)" << endl;
   wikiHow << "Drogue fired at a height of: " << curH-initH << "m;" << endl;
   drogueFired = 1;
   droguePin->setval_gpio("1");
@@ -201,8 +205,8 @@ void Jimbo::fireDrogue(){
 void Jimbo::fireMain(){
   //turn pin attached to main charge to HIGH
   int mainT = clock() - totalT;
-  wikiHow << "Main fired at time: " << (int)((mainT/CLOCKS_PER_SEC)/60) << " minute(s) ";
-  wikiHow << ((mainT/CLOCKS_PER_SEC)%60) << " second(s)" << endl;
+  wikiHow << "Main fired at time: " << (int)(((double)mainT/CLOCKS_PER_SEC)/60) << " minute(s) ";
+  wikiHow << ((int)((double)mainT/CLOCKS_PER_SEC)%60) << " second(s)" << endl;
   wikiHow << "Main fired at a height of: " << curH-initH << "m;" << endl;
   mainFired = 1;
   mainPin->setval_gpio("1");
@@ -210,8 +214,8 @@ void Jimbo::fireMain(){
 
 int Jimbo::endFlight(){
   totalT = clock() - totalT;
-  wikiHow << "Total time elapsed: " << (int)((totalT/CLOCKS_PER_SEC)/60) << " minute(s)";
-  wikiHow << ((totalT/CLOCKS_PER_SEC)%60) << " second(s);" << endl;
+  wikiHow << "Total time elapsed: " << (int)(getTotTime()/60) << " minute(s)";
+  wikiHow << ((int)getTotTime()%60) << " second(s);" << endl;
   wikiHow << "Max height achieved: " << maxH << "m (that's a lot!);" << endl;
   wikiHow << "Max velocity achieved: " << maxV << "m/s (woah, slow down there, Speed Racer);" << endl;
   wikiHow << "Max acceleration achieved: " << maxA << "m/s/s (I think my neck hurts);" << endl;
@@ -223,6 +227,8 @@ int Jimbo::endFlight(){
   delete mainPin;
   droguePin = NULL;
   mainPin = NULL;
+
+  landed = 1;
 
   return 0;
 }
@@ -241,7 +247,7 @@ void Jimbo::altimeterGather(){
 	config[0] = 0x26;
 	config[1] = 0xB9;
 	write(file, config, 2);
-	//sleep(1);
+	usleep(1000);
 
 	// Read 6 bytes of data from address 0x00(00)
 	// status, tHeight msb1, tHeight msb, tHeight lsb, temp msb, temp lsb
@@ -262,7 +268,7 @@ void Jimbo::altimeterGather(){
 	config[0] = 0x26;
 	config[1] = 0x39;
 	write(file, config, 2);
-	//sleep(1);
+	//usleep(1000000);
 
 	// Read 4 bytes of data from register(0x00)
 	// status, pres msb1, pres msb, pres lsb
@@ -277,12 +283,12 @@ void Jimbo::altimeterGather(){
 
 //returns the elapsed time
 double Jimbo::getTotTime(){
-  return (clock()-totalT)/CLOCKS_PER_SEC;
+  return ((double)(clock()-totalT))/CLOCKS_PER_SEC;
 }
 
 
 //appends a value to avgArray and updates H, V, and A;
-int Jimbo::updateAll(){
+void Jimbo::updateAll(){
 
   altimeterGather();
   append(altitude);
@@ -291,15 +297,15 @@ int Jimbo::updateAll(){
   setA();
 
   if((curV<0) && ((curH-initH)/(maxH-initH) <= drogueLRatio)){
-    fireDrogue();
+    //fireDrogue(); //removed for testing purposes
   }
 
   if((drogueFired) && ((curH-initH) <= mainLHFt)){
-    fireMain();
+    //fireMain(); //removed for testing purposes
   }
 
   if((curH<=1.01*initH) && drogueFired && mainFired && (curV <= 0.1 && curV >= -0.1) && (curA <= 0.1 && curA >= -0.1)){
-    return endFlight();
+    //endFlight(); //problem here !!!!!
   }
 }
 
@@ -312,8 +318,8 @@ Jimbo::Jimbo(){
   //droguePin->export_gpio(); // not needed with GPIOClass_v2
   //mainPin->export_gpio(); // not needed with GPIOClass_v2
   cout << "I'm here!" << endl;
-  droguePin->setdir_gpio("out");
-  mainPin->setdir_gpio("out");
+  //droguePin->setdir_gpio("out"); // for testing purposes, we are taking this out, so we dont need to reboot
+  //mainPin->setdir_gpio("out");
   cout << "Now I'm here!" << endl;
   
   file = open(bus, O_RDWR);
@@ -351,7 +357,11 @@ int main(){
   
   //run for 10 seconds
   while(tonyTim.getTotTime() < 10){
-    tonyTim.updateAll();
+    cout << tonyTim.getTotTime() << endl;
+    //tonyTim.updateAll();
+  }
+  if(tonyTim.landed){
+     return 0;
   }
   return 0;
 }
