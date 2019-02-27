@@ -37,11 +37,10 @@ class Jimbo{
   char config[2] = {0};
 
   char reg[1] = {0x00};
-	char data[6] = {0};
+  char data[6] = {0};
 
   int tHeight, temp, pres;
   float altitude, cTemp, fTemp, pressure;
-
 
   //output file stream
   ofstream wikiHow;
@@ -62,10 +61,9 @@ class Jimbo{
   //max height ratio to fire drogue charge
   double drogueLRatio = 0.9;
 
-  //boolean to determine if the drogue 'chute has fired.
+  //booleans to determine if the 'chutes fired.
   bool drogueFired = 0;
   bool mainFired = 0;
-  
 
   //internal counter
   int counter = 0;
@@ -94,7 +92,7 @@ class Jimbo{
   void beep();
 
   //updates the previous height, vel., accl., and updates their respective values
-  // based on average heights and the change in height and velocity respectively
+  //based on average heights and the change in height and velocity respectively
   void setH();
   void setV();
   void setA();
@@ -142,7 +140,6 @@ double Jimbo::average(double *points, int numPnts){
 
 //unsure what to place here, so currently is used as a placeholder
 void Jimbo::beep(){ //beepu
-
 }
 
 //takes an average of heights for the new current height as a parameter, and updates the
@@ -152,7 +149,7 @@ void Jimbo::setH(){
   preH = curH;
   curH = average(avgArray, window);
   //altimeterData << curH << ", " << getTotTime() << endl;
-  cout << curH << ", " << getTotTime() << ", " << clock() << ", " << totalT << ", " << clock()-totalT << endl;
+  cout << curH << endl;
 
   if(maxH<curH){
     maxH = curH;
@@ -212,6 +209,7 @@ void Jimbo::fireMain(){
   mainPin->setval_gpio("1");
 }
 
+//Finalize the output file and public variables.
 int Jimbo::endFlight(){
   totalT = clock() - totalT;
   wikiHow << "Total time elapsed: " << (int)(getTotTime()/60) << " minute(s)";
@@ -315,12 +313,10 @@ Jimbo::Jimbo(){
   totalT = clock();
   wikiHow.open("wikiHow.txt");
   altimeterData.open("altimeterData.txt");
-  //droguePin->export_gpio(); // not needed with GPIOClass_v2
-  //mainPin->export_gpio(); // not needed with GPIOClass_v2
   cout << "I'm here!" << endl;
   //droguePin->setdir_gpio("out"); // for testing purposes, we are taking this out, so we dont need to reboot
   //mainPin->setdir_gpio("out");
-  cout << "Now I'm here!" << endl;
+  //cout << "Now I'm here!" << endl;
   
   file = open(bus, O_RDWR);
   ioctl(file, I2C_SLAVE, 0x60);
