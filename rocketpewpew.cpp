@@ -34,7 +34,7 @@ class Jimbo{
   int file;
   char *bus = "/dev/i2c-1";
 
-  char config[2] = {0};
+  
 
   char reg[1] = {0x00};
   char data[6] = {0};
@@ -69,6 +69,7 @@ class Jimbo{
   int counter = 0;
 
   //elapsed time
+  double totT=0;
   clock_t totalT;
   clock_t dt;
 
@@ -76,7 +77,7 @@ class Jimbo{
   const double byap = 1;
 
   //averaging window
-  const static int window = 100;
+  const static int window = 1;
 
   //averaging array
   double avgArray[window] = {0};
@@ -104,12 +105,18 @@ class Jimbo{
   void fireDrogue();
   void fireMain();
 
-  int endFlight();
+  //int endFlight();
 
   void altimeterGather();
 
+  void clearScreen();
+
 
   public:
+
+  //test
+  int endFlight();
+
   //returns elapsed time
   double getTotTime();
 
@@ -148,8 +155,14 @@ void Jimbo::beep(){ //beepu
 void Jimbo::setH(){
   preH = curH;
   curH = average(avgArray, window);
+<<<<<<< HEAD
   //altimeterData << curH << ", " << getTotTime() << endl;
   cout << curH << endl;
+=======
+  altimeterData << curH << ", " << getTotTime() << endl;
+  //cout << curH << endl;
+  //clearScreen();
+>>>>>>> fd3f482d287d7c9d5ae27f5a4b8e750def3f76bc
 
   if(maxH<curH){
     maxH = curH;
@@ -185,6 +198,9 @@ void Jimbo::append(double newInput){
   dt = clock();
   avgArray[counter] = newInput;
   counter++;
+  if(!(counter < window)){
+     counter = 0;
+  }
 }
 
 //fires drogue charge
@@ -220,7 +236,7 @@ int Jimbo::endFlight(){
   wikiHow.close();
   
   altimeterData.close();
-
+  
   delete droguePin;
   delete mainPin;
   droguePin = NULL;
@@ -232,6 +248,8 @@ int Jimbo::endFlight(){
 }
 
 void Jimbo::altimeterGather(){
+  char config[2] = {0};
+
   config[0] = 0x26;
 	config[1] = 0xB9;
 	write(file, config, 2);
@@ -245,7 +263,9 @@ void Jimbo::altimeterGather(){
 	config[0] = 0x26;
 	config[1] = 0xB9;
 	write(file, config, 2);
-	usleep(1000);
+	usleep(100000);
+        totT = totT+0.1;
+	
 
 	// Read 6 bytes of data from address 0x00(00)
 	// status, tHeight msb1, tHeight msb, tHeight lsb, temp msb, temp lsb
@@ -266,7 +286,8 @@ void Jimbo::altimeterGather(){
 	config[0] = 0x26;
 	config[1] = 0x39;
 	write(file, config, 2);
-	//usleep(1000000);
+	usleep(100000);
+        totT = totT+0.1;
 
 	// Read 4 bytes of data from register(0x00)
 	// status, pres msb1, pres msb, pres lsb
@@ -281,7 +302,8 @@ void Jimbo::altimeterGather(){
 
 //returns the elapsed time
 double Jimbo::getTotTime(){
-  return ((double)(clock()-totalT))/CLOCKS_PER_SEC;
+  
+  return ((double)(clock()-totalT))/CLOCKS_PER_SEC + totT;
 }
 
 
@@ -303,8 +325,13 @@ void Jimbo::updateAll(){
   }
 
   if((curH<=1.01*initH) && drogueFired && mainFired && (curV <= 0.1 && curV >= -0.1) && (curA <= 0.1 && curA >= -0.1)){
-    //endFlight(); //problem here !!!!!
+    //endFlight();
   }
+}
+
+void Jimbo::clearScreen(){
+  cout << flush;
+  system("clear");
 }
 
 // currently empty (possibly going to be parameterized). Will initialize height.
@@ -352,10 +379,11 @@ int main(){
   cout << "initialization complete!" << endl;
   
   //run for 10 seconds
-  while(tonyTim.getTotTime() < 10){
-    cout << tonyTim.getTotTime() << endl;
-    //tonyTim.updateAll();
+  while(tonyTim.getTotTime() < 0.5){
+    //cout << tonyTim.getTotTime() << endl;
+    tonyTim.updateAll();
   }
+  tonyTim.endFlight();
   if(tonyTim.landed){
      return 0;
   }
