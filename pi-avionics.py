@@ -68,7 +68,8 @@ def gatherHeight(counter):
 
 #Initialize the first window of data points!
 for index in rawHeightCircle:
-    appendtoCircle(pingAlt(),counter)
+    pingAlt()
+    appendtoCircle(altitude,counter)
 
 #Get an initial average
 iH = updateHeight()
