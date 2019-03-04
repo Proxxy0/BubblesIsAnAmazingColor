@@ -1,5 +1,5 @@
-Rocket starting at a height of: 397373m. All proceeding heights will be adjusted accordingly.;
+Rocket starting at a height of: 291095m. All proceeding heights will be adjusted accordingly.;
 Total time elapsed: 0 minute(s)0 second(s);
-Max height achieved: 397373m (that's a lot!);
-Max velocity achieved: 0m/s (woah, slow down there, Speed Racer);
-Max acceleration achieved: 0m/s/s (I think my neck hurts);
+Max height achieved: 393295m (that's a lot!);
+Max velocity achieved: 3.57334e+08m/s (woah, slow down there, Speed Racer);
+Max acceleration achieved: 2.72964e+13m/s/s (I think my neck hurts);
