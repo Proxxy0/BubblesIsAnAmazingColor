@@ -34,13 +34,16 @@ class Jimbo{
   int file;
   char *bus = "/dev/i2c-1";
 
+  char config[2] = {0};
+
   
 
   char reg[1] = {0x00};
-  char data[6] = {0};
+	char data[6] = {0};
 
   int tHeight, temp, pres;
   float altitude, cTemp, fTemp, pressure;
+
 
   //output file stream
   ofstream wikiHow;
@@ -61,9 +64,10 @@ class Jimbo{
   //max height ratio to fire drogue charge
   double drogueLRatio = 0.9;
 
-  //booleans to determine if the 'chutes fired.
+  //boolean to determine if the drogue 'chute has fired.
   bool drogueFired = 0;
   bool mainFired = 0;
+  
 
   //internal counter
   int counter = 0;
@@ -77,7 +81,7 @@ class Jimbo{
   const double byap = 1;
 
   //averaging window
-  const static int window = 1;
+  const static int window = 100;
 
   //averaging array
   double avgArray[window] = {0};
@@ -93,7 +97,7 @@ class Jimbo{
   void beep();
 
   //updates the previous height, vel., accl., and updates their respective values
-  //based on average heights and the change in height and velocity respectively
+  // based on average heights and the change in height and velocity respectively
   void setH();
   void setV();
   void setA();
@@ -138,7 +142,7 @@ class Jimbo{
 double Jimbo::average(double *points, int numPnts){
   double mean;
   for(int i = 0; i<numPnts; i++){
-    mean += points[i]/numPnts;
+    mean += points[i]/(float)numPnts;
   }
 
   dt = clock() - dt;
@@ -147,6 +151,7 @@ double Jimbo::average(double *points, int numPnts){
 
 //unsure what to place here, so currently is used as a placeholder
 void Jimbo::beep(){ //beepu
+
 }
 
 //takes an average of heights for the new current height as a parameter, and updates the
@@ -155,14 +160,9 @@ void Jimbo::beep(){ //beepu
 void Jimbo::setH(){
   preH = curH;
   curH = average(avgArray, window);
-<<<<<<< HEAD
-  //altimeterData << curH << ", " << getTotTime() << endl;
-  cout << curH << endl;
-=======
   altimeterData << curH << ", " << getTotTime() << endl;
   //cout << curH << endl;
   //clearScreen();
->>>>>>> fd3f482d287d7c9d5ae27f5a4b8e750def3f76bc
 
   if(maxH<curH){
     maxH = curH;
@@ -225,7 +225,6 @@ void Jimbo::fireMain(){
   mainPin->setval_gpio("1");
 }
 
-//Finalize the output file and public variables.
 int Jimbo::endFlight(){
   totalT = clock() - totalT;
   wikiHow << "Total time elapsed: " << (int)(getTotTime()/60) << " minute(s)";
@@ -248,8 +247,6 @@ int Jimbo::endFlight(){
 }
 
 void Jimbo::altimeterGather(){
-  char config[2] = {0};
-
   config[0] = 0x26;
 	config[1] = 0xB9;
 	write(file, config, 2);
@@ -263,8 +260,8 @@ void Jimbo::altimeterGather(){
 	config[0] = 0x26;
 	config[1] = 0xB9;
 	write(file, config, 2);
-	usleep(100000);
-        totT = totT+0.1;
+	//usleep(10000);
+        //totT = totT+0.01;
 	
 
 	// Read 6 bytes of data from address 0x00(00)
@@ -286,8 +283,8 @@ void Jimbo::altimeterGather(){
 	config[0] = 0x26;
 	config[1] = 0x39;
 	write(file, config, 2);
-	usleep(100000);
-        totT = totT+0.1;
+	//usleep(10000);
+        //totT = totT+0.01;
 
 	// Read 4 bytes of data from register(0x00)
 	// status, pres msb1, pres msb, pres lsb
@@ -340,10 +337,12 @@ Jimbo::Jimbo(){
   totalT = clock();
   wikiHow.open("wikiHow.txt");
   altimeterData.open("altimeterData.txt");
+  //droguePin->export_gpio(); // not needed with GPIOClass_v2
+  //mainPin->export_gpio(); // not needed with GPIOClass_v2
   cout << "I'm here!" << endl;
   //droguePin->setdir_gpio("out"); // for testing purposes, we are taking this out, so we dont need to reboot
   //mainPin->setdir_gpio("out");
-  //cout << "Now I'm here!" << endl;
+  cout << "Now I'm here!" << endl;
   
   file = open(bus, O_RDWR);
   ioctl(file, I2C_SLAVE, 0x60);
@@ -380,7 +379,7 @@ int main(){
   
   //run for 10 seconds
   while(tonyTim.getTotTime() < 0.5){
-    //cout << tonyTim.getTotTime() << endl;
+    cout << tonyTim.getTotTime() << endl;
     tonyTim.updateAll();
   }
   tonyTim.endFlight();

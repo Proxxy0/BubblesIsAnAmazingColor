@@ -1,6 +1,9 @@
-from smbus2 import SMBus
+import smbus
 import time
 import numpy as np
+import os
+
+clear = lambda: os.system('clear')
 
 #current height--this is the processed value of the raw heights
 cH = 0
@@ -17,7 +20,7 @@ print(counter)
 #Final State: set the altitude variable.
 def pingAlt():
     # Get I2C bus
-    bus = SMBus(1)
+    bus = smbus.SMBus(1)
 
     # MPL3115A2 address, 0x60(96)
     # Select control register, 0x26(38)
@@ -32,7 +35,7 @@ def pingAlt():
     #               0xB9(185)       Active mode, OSR = 128, Altimeter mode
     bus.write_byte_data(0x60, 0x26, 0xB9)
 
-    time.sleep(1)
+    #time.sleep(.001)
 
     # MPL3115A2 address, 0x60(96)
         # Read data back from 0x00(00), 6 bytes
@@ -72,10 +75,10 @@ for index in rawHeightCircle:
 
 #Get an initial average
 iH = updateHeight()
-print("Initial Height: %f", iH)
+print("Initial Height:", iH)
 
 #Go into the main program loop
-while(true):
+while(True):
     gatherHeight(counter)
-    print("Current Height: %f", cH)
-
+    print("Current Height:", cH)
+    clear()

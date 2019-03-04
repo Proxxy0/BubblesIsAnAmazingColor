@@ -15,6 +15,7 @@ using namespace std;
 
 int main()
 {
+	for(int i = 0; i<1000; i++){
 	// Create I2C bus
 	int file;
 	char *bus = "/dev/i2c-1";
@@ -42,7 +43,7 @@ int main()
 	config[0] = 0x26;
 	config[1] = 0xB9;
 	write(file, config, 2);
-	sleep(1);
+	//sleep(1);
 
 	// Read 6 bytes of data from address 0x00(00)
 	// status, tHeight msb1, tHeight msb, tHeight lsb, temp msb, temp lsb
@@ -67,7 +68,7 @@ int main()
 	config[0] = 0x26;
 	config[1] = 0x39;
 	write(file, config, 2);
-	sleep(1);
+	//sleep(1);
 
 	// Read 4 bytes of data from register(0x00)
 	// status, pres msb1, pres msb, pres lsb
@@ -84,6 +85,7 @@ int main()
 	printf("Altitude : %.2f m \n", altitude);
 	printf("Temperature in Celsius : %.2f C \n", cTemp);
 	printf("Temperature in Fahrenheit : %.2f F \n", fTemp);
+	}
 
 	exit(0);
 
