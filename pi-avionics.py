@@ -2,8 +2,15 @@ import smbus
 import time
 import numpy as np
 import os
+import RPi.GPIO as GPIO
 
 clear = lambda: os.system('clear')
+
+#INITIALIZE VARIABLES AND PIN STATES
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(5, GPIO.OUT)
+GPIO.setup(6, GPIO.OUT)
+GPIO.setup(18, GPIO.OUT)
 
 #current height--this is the processed value of the raw heights
 cH = 0
@@ -13,7 +20,23 @@ window = 10
 
 #This is the index counter for the circular height array
 counter = 0
-print(counter)
+
+#Run Startup Tones-----------------------------------------------------------
+startfreq = 400
+pwm = GPIO.PWM(18, startfreq)
+pwm.start(50)
+time.sleep(0.5)
+for frequency in np.arange(800):
+    pwm.start(50)
+    time.sleep(0.005)
+    pwm.ChangeFrequency(startfreq+frequency)
+    endfreq = startfreq+frequency
+for frequency in np.arange(800):
+    pwm.ChangeFrequency(endfreq-frequency)
+    time.sleep(0.005)
+pwm.stop()
+#----------------------------------------------------------------------------
+
 
 #----------------------------------------------------------------------------
 #pingAlt is code supplied from ControlEverything's altimeter source
@@ -48,7 +71,6 @@ def pingAlt():
 
     # Output data to screen
     print("Altitude : %.2f m" %altitude)
-
 #----------------------------------------------------------------------------
 
 #appendtoCircle creates and fills a circular array of heights. This
@@ -71,15 +93,22 @@ def gatherHeight(counter):
 
 #Initialize the first window of data points!
 for index in rawHeightCircle:
-    pingAlt()
-    appendtoCircle(altitude,counter)
+    appendtoCircle(pingAlt(),counter)
 
 #Get an initial average
 iH = updateHeight()
 print("Initial Height:", iH)
 
+pwm.ChangeFrequency(1500)
 #Go into the main program loop
+beepcount = 0
 while(True):
     gatherHeight(counter)
     print("Current Height:", cH)
+    if beepcount is 200:
+        pwm.start(50)
+    if beepcount is 225:
+        pwm.stop()
+        beepcount = 0
+    beepcount = beepcount+1
     clear()
