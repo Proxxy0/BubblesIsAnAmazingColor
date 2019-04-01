@@ -70,7 +70,7 @@ def pingAlt():
     #               0xB9(185)       Active mode, OSR = 128, Altimeter mode
     bus.write_byte_data(0x60, 0x26, 0xB9)
 
-    time.sleep(.5)
+   #time.sleep(.5)
 
     # MPL3115A2 address, 0x60(96)
         # Read data back from 0x00(00), 6 bytes
@@ -122,11 +122,11 @@ def endFlight():
     outputfile.close()
 
 #Initialize the first window of data points!
-for index in rawHeightCircle:
-    appendtoCircle(pingAlt())
+for index in RHC:
+    appendtoCircle(pingAlt(),counter,RHC)
 
 #Get an initial average
-iH = updateHeight()
+iH = getH(RHC,cH)
 print("Initial Height:", iH)
 
 pwm.ChangeFrequency(1500)
@@ -134,8 +134,8 @@ pwm.ChangeFrequency(1500)
 beepcount = 0
 finalcount = 0
 while(finalcount < 10):
-    gatherHeight()
-    print(rawHeightCircle)
+    gatherHeight(counter,RHC,cH)
+    print(RHC)
     print("Current Height:", cH, " Count: ", counter)
     outputstring = ""+str(cH)+"\t"+str(time.time()-starttime)+"\n"
     outputfile.write(outputstring)
@@ -149,5 +149,5 @@ while(finalcount < 10):
     clear()
     finalcount = finalcount+1
     
-    if(
+    #if(
 outputfile.close()

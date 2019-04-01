@@ -53,6 +53,7 @@ class Jimbo{
   double preH, curH, maxH = 0;
   double preV, curV, maxV = 0;
   double preA, curA, maxA = 0;
+  double prevAlt = 0;
 
   //Initial height
   double initH;
@@ -295,6 +296,12 @@ void Jimbo::altimeterGather(){
 	// Convert the data to 20-bits
 	pres = ((data[1] * 65536) + (data[2] * 256 + (data[3] & 0xF0))) / 16;
 	pressure = (pres / 4.0) / 1000.0;
+
+        // Test for corrupted data
+        if(altitude > 10000)
+           altitude = prevAlt;
+        else
+           prevAlt = altitude;
 }
 
 //returns the elapsed time
