@@ -2,9 +2,6 @@
 #include "jimbo.h"
 
 
-const double GRAVITY = -9.8;
-const double METER_TO_FEET = 3.28084;
-const double FEET_TO_METER = 1/METER_TO_FEET;
 
 using namespace std;
 //##############################################################################
