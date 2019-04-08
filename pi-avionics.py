@@ -19,12 +19,14 @@ starttime = time.time()
 
 #current height--this is the processed value of the raw heights
 cH = 0
+maxH = 0
 cT = time.time()
 prevH = 0
 prevT = 0
 cV = 0
 prevV = 0
 cA = 0
+maxHT = 0
 
 #This is the width of our average
 window = 10
@@ -86,11 +88,13 @@ def pingAlt():
     return(altitude)
 #----------------------------------------------------------------------------
 
+#UPDATE FUNCTIONS
+#--------------------------------------------------------------------
 #appendtoCircle creates and fills a circular array of heights. This
 #is the "window" that shifts across the data points. The values
 #are overwritten as more samples are taken. This way, only 10 data
 #points are stored.
-RHC = np.zeros(window)
+RHC = np.zeros(window) #Raw Height Circle
 def appendtoCircle(sample,counter,RHC):
     RHC[counter] = sample
     counter = counter+1
@@ -105,11 +109,6 @@ def getT(cT):
     cT = time.time()
     return(cT)
 
-#def gatherHeight(counter,RHC,cH):
-#    appendtoCircle(pingAlt(),counter,RHC)
-
-#def Drogue():
-
 def getV(prevH,prevT,cH,cT):
     cV = (cH-prevH)/(cT-prevT)
     return cV
@@ -118,23 +117,55 @@ def getA(prevV,prevT,cV,cT):
     cA = (cV-prevV)/(cT-prevT)
     return cA
 
-def endFlight():
+def inc(counter):
+    counter = counter+1
+    if(counter is window):
+        counter = 0
+    return(counter)
+#--------------------------------------------------------------------
+
+def endFlight(outputfile):
     outputfile.close()
 
+def Drogue():
+
+def Main():
+
+
+#BEGIN PROGRAM
+#--------------------------------------------------------------------
+#INITIALIZATION STEP--------------------------
 #Initialize the first window of data points!
 for index in RHC:
     appendtoCircle(pingAlt(),counter,RHC)
+    counter = inc(counter)
 
 #Get an initial average
 iH = getH(RHC,cH)
 print("Initial Height:", iH)
+#---------------------------------------------
 
 pwm.ChangeFrequency(1500)
 #Go into the main program loop
 beepcount = 0
 finalcount = 0
 while(finalcount < 10):
-    gatherHeight(counter,RHC,cH)
+    
+    appendtoCircle(pingAlt(),counter,RHC)
+    counter = inc(counter)
+    prevH = cH
+    cH = getH(RHC,cH)
+    prevT = cT
+    cT = getT(cT)
+    prevV = cV
+    cV = getV(prevH,prevT,cH,cT)
+    cA = getA(prevV,prevT,cV,cT)
+
+    if(cH > prevH):
+	maxH = cH
+	maxHT = cT
+        
+
     print(RHC)
     print("Current Height:", cH, " Count: ", counter)
     outputstring = ""+str(cH)+"\t"+str(time.time()-starttime)+"\n"
@@ -149,5 +180,10 @@ while(finalcount < 10):
     clear()
     finalcount = finalcount+1
     
-    #if(
-outputfile.close()
+    if(cH < maxH and (cT+5) > maxHT):
+	Drogue()
+	drogueFlag = 1
+    if(cH < 500 and drogueFlag is 1):
+	Main()
+	mainFlag = 1
+endflight(outputfile)
