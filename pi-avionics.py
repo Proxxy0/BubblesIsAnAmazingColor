@@ -97,9 +97,6 @@ def pingAlt():
 RHC = np.zeros(window) #Raw Height Circle
 def appendtoCircle(sample,counter,RHC):
     RHC[counter] = sample
-    counter = counter+1
-    if(counter is window):
-        counter = 0
 
 def getH(RHC,cH):
     cH = np.average(RHC)
@@ -128,12 +125,12 @@ def endFlight(outputfile):
     outputfile.close()
 
 def Drogue():
-
+    GPIO.output(5, HIGH)
 def Main():
-
+    GPIO.output(6, HIGH)
 
 #BEGIN PROGRAM
-#--------------------------------------------------------------------
+#-------------------------------------------------------------------
 #INITIALIZATION STEP--------------------------
 #Initialize the first window of data points!
 for index in RHC:
@@ -148,8 +145,8 @@ print("Initial Height:", iH)
 pwm.ChangeFrequency(1500)
 #Go into the main program loop
 beepcount = 0
-finalcount = 0
-while(finalcount < 10):
+#finalcount = 0
+while(true):
     
     appendtoCircle(pingAlt(),counter,RHC)
     counter = inc(counter)
@@ -164,7 +161,6 @@ while(finalcount < 10):
     if(cH > prevH):
 	maxH = cH
 	maxHT = cT
-        
 
     print(RHC)
     print("Current Height:", cH, " Count: ", counter)
@@ -178,12 +174,17 @@ while(finalcount < 10):
         beepcount = 0
     beepcount = beepcount+1
     clear()
-    finalcount = finalcount+1
+ #   finalcount = finalcount+1
     
-    if(cH < maxH and (cT+5) > maxHT):
+    if(cH < maxH and (cT+5) > maxHT and (cH - iH) > 150):
 	Drogue()
 	drogueFlag = 1
-    if(cH < 500 and drogueFlag is 1):
+	outputfile.write("\n \n Drogue \n \n"+str(cT))
+    if(cH < 150 and drogueFlag is 1):
 	Main()
 	mainFlag = 1
-endflight(outputfile)
+	outputfile.write("\n \n Main \n \n"+str(cT))
+
+    if(mainFlag is 1 and 2 > cV > -2):
+	endflight(outputfile)
+#endflight(outputfile)
