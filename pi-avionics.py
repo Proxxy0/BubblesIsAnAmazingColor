@@ -27,6 +27,8 @@ cV = 0
 prevV = 0
 cA = 0
 maxHT = 0
+mainFlag = 0
+drogueFlag = 0
 
 #This is the width of our average
 window = 10
@@ -146,7 +148,7 @@ pwm.ChangeFrequency(1500)
 #Go into the main program loop
 beepcount = 0
 #finalcount = 0
-while(true):
+while(True):
     
     appendtoCircle(pingAlt(),counter,RHC)
     counter = inc(counter)
