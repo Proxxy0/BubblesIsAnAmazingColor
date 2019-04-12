@@ -218,11 +218,11 @@ Jimbo::Jimbo(){
   file = open(bus, O_RDWR);
   ioctl(file, I2C_SLAVE, 0x60);
   
-  //pinMode(droguePin, OUTPUT);
-  //pinMode(mainPin, OUTPUT);
-  //pinMode(beepPin, OUTPUT);
+  pinMode(droguePin, OUTPUT);
+  pinMode(mainPin, OUTPUT);
+  pinMode(beepPin, OUTPUT);
   
-  //softToneCreate(beepPin);
+  softToneCreate(beepPin);
   
 
   for(int i = 0; i<window; i++){
