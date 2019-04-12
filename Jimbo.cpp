@@ -195,10 +195,10 @@ void Jimbo::updateAll(){
   setV();
   setA();
   
-  if((int)(100*(double)(clock()-totalT)/CLOCKS_PER_SEC))%200==0){
+  if(((int)(100*(double)(clock()-totalT)/CLOCKS_PER_SEC))%200==0){
     beep(1500);
   }
-  if((int)(100*(double)(clock()-totalT)/CLOCKS_PER_SEC))%225==0){
+  if(((int)(100*(double)(clock()-totalT)/CLOCKS_PER_SEC))%225==0){
     beep(0);
   }
   
