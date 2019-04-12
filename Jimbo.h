@@ -89,9 +89,9 @@ class Jimbo{
   double avgArray[window] = {0};
 
   //GPIO pins  
-  #define droguePin = 5;
-  #define mainPin = 6;
-  #define beepPin = 10;
+  int droguePin = 5;
+  int mainPin = 6;
+  int beepPin = 18;
   
   
 
