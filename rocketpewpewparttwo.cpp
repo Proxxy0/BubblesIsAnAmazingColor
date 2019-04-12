@@ -29,7 +29,7 @@ int main(){
   cout << "initialization complete!" << endl;
 
   //run for 10 seconds
-  while(tonyTim.getTotTime() < 0.5){
+  while(tonyTim.getTotTime() < 0.1){
     cout << tonyTim.getTotTime() << endl;
     tonyTim.updateAll();
   }
