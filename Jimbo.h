@@ -18,6 +18,10 @@
 #include <wiringPi.h>
 #include <softTone.h>
 
+#define droguePin 5
+#define mainPin 6
+#define beepPin 18
+
 const double GRAVITY = -9.8;
 const double METER_TO_FEET = 3.28084;
 const double FEET_TO_METER = 1/METER_TO_FEET;
@@ -89,15 +93,7 @@ class Jimbo{
   double avgArray[window] = {0};
 
   //GPIO pins  
-  int droguePin = 5;
-  int mainPin = 6;
-  int beepPin = 18;
-  
-  pinMode(droguePin, OUTPUT);
-  pinMode(mainPin, OUTPUT);
-  pinMode(beepPin, OUTPUT);
-  
-  softToneCreate(beepPin);
+
   
   
 
