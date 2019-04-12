@@ -19,8 +19,8 @@ double Jimbo::average(double *points, int numPnts){
 }
 
 //unsure what to place here, so currently is used as a placeholder
-void Jimbo::beep(){ //beepu
-
+void Jimbo::beep(int freq){ //beepu
+  softToneWrite(beepPin, freq);
 }
 
 //takes an average of heights for the new current height as a parameter, and updates the
@@ -80,7 +80,7 @@ void Jimbo::fireDrogue(){
   wikiHow << ((int)((double)drogueT/CLOCKS_PER_SEC)%60) << " second(s)" << endl;
   wikiHow << "Drogue fired at a height of: " << curH-initH << "m;" << endl;
   drogueFired = 1;
-  droguePin->setval_gpio("1");
+  digitalWrite(droguePin, HIGH);
 }
 
 //fire main charge
@@ -91,7 +91,7 @@ void Jimbo::fireMain(){
   wikiHow << ((int)((double)mainT/CLOCKS_PER_SEC)%60) << " second(s)" << endl;
   wikiHow << "Main fired at a height of: " << curH-initH << "m;" << endl;
   mainFired = 1;
-  mainPin->setval_gpio("1");
+  digitalWrite(mainPin, HIGH);
 }
 
 int Jimbo::endFlight(){
@@ -105,10 +105,6 @@ int Jimbo::endFlight(){
 
   altimeterData.close();
 
-  delete droguePin;
-  delete mainPin;
-  droguePin = NULL;
-  mainPin = NULL;
 
   landed = 1;
 
@@ -221,6 +217,13 @@ Jimbo::Jimbo(){
 
   file = open(bus, O_RDWR);
   ioctl(file, I2C_SLAVE, 0x60);
+  
+  pinMode(drougePin, OUTPUT);
+  pinMode(mainPin, OUTPUT);
+  pinMode(beepPin, OUTPUT);
+  
+  softToneCreate(beepPin);
+  
 
   for(int i = 0; i<window; i++){
     altimeterGather();
@@ -241,6 +244,13 @@ Jimbo::Jimbo(){
   setH();
   setV();
   setA();
+  
+  for(int i = 0; i<4; i++){
+      beep(440);
+      usleep(500000);
+      beep(0);
+      usleep(500000);
+  }
 }
 
 Jimbo::~Jimbo(){}

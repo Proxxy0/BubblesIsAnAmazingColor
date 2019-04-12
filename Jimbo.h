@@ -12,10 +12,11 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "GPIOClass.h"
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <wiringPi.h>
+#include <softTone.h>
 
 const double GRAVITY = -9.8;
 const double METER_TO_FEET = 3.28084;
@@ -87,15 +88,18 @@ class Jimbo{
   //averaging array
   double avgArray[window] = {0};
 
-  //GPIO pins
-  GPIOClass* droguePin = new GPIOClass("4");
-  GPIOClass* mainPin = new GPIOClass("5");
+  //GPIO pins  
+  #define droguePin = 5;
+  #define mainPin = 6;
+  #define beepPin = 10;
+  
+  
 
   //averages an array of points
   double average(double *points, int numPnts);
 
   //arming beeps
-  void beep();
+  void beep(int);
 
   //updates the previous height, vel., accl., and updates their respective values
   // based on average heights and the change in height and velocity respectively
