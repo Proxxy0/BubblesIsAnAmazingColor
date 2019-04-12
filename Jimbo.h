@@ -101,7 +101,7 @@ class Jimbo{
   double average(double *points, int numPnts);
 
   //arming beeps
-  void beep(int);
+  void beep(int, int, boolean);
 
   //updates the previous height, vel., accl., and updates their respective values
   // based on average heights and the change in height and velocity respectively
