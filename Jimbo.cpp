@@ -218,6 +218,8 @@ Jimbo::Jimbo(){
   file = open(bus, O_RDWR);
   ioctl(file, I2C_SLAVE, 0x60);
   
+  wiringPiSetupGpio()
+  
   pinMode(droguePin, OUTPUT);
   pinMode(mainPin, OUTPUT);
   pinMode(beepPin, OUTPUT);
