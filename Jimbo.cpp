@@ -194,6 +194,14 @@ void Jimbo::updateAll(){
   setH();
   setV();
   setA();
+  
+  if((int)(100*(double)(clock()-totalT)/CLOCKS_PER_SEC))%200==0){
+    beep(1500);
+  }
+  else if((int)(100*(double)(clock()-totalT)/CLOCKS_PER_SEC))%225==0){
+    beep(0);
+  }
+  
 
   if((curV<0) && ((curH-initH)/(maxH-initH) <= drogueLRatio)){
     //fireDrogue(); //removed for testing purposes
