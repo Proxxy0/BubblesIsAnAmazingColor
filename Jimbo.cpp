@@ -19,7 +19,7 @@ double Jimbo::average(double *points, int numPnts){
 }
 
 //unsure what to place here, so currently is used as a placeholder
-void Jimbo::beep(int freqi, int freqf = freqi, boolean rising = false;){ //beepu
+void Jimbo::beep(int freqi, int freqf, boolean rising){ //beepu
   if(rising){
     int i = freqi;
     
