@@ -25,6 +25,7 @@ void Jimbo::beep(int freqi, int freqf, bool rising){ //beepu
     
     while(i<freqf){
       softToneWrite(beepPin, i);
+      usleep(5000);
       i++;
     }
   }
