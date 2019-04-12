@@ -19,8 +19,18 @@ double Jimbo::average(double *points, int numPnts){
 }
 
 //unsure what to place here, so currently is used as a placeholder
-void Jimbo::beep(int freq){ //beepu
-  softToneWrite(beepPin, freq);
+void Jimbo::beep(int freqi, int freqf = freqi, boolean rising = false;){ //beepu
+  if(rising){
+    int i = freqi;
+    
+    while(i<freqf){
+      softToneWrite(beepPin, i);
+      i++;
+    }
+  }
+  else{
+    softToneWrite(beepPin, freqi);
+  }
 }
 
 //takes an average of heights for the new current height as a parameter, and updates the
@@ -248,7 +258,7 @@ Jimbo::Jimbo(){
   setA();
   
   for(int i = 0; i<4; i++){
-      beep(440);
+      beep(440, 540, true);
       usleep(500000);
       beep(0);
       usleep(500000);
