@@ -93,6 +93,12 @@ class Jimbo{
   int mainPin = 6;
   int beepPin = 18;
   
+  pinMode(droguePin, OUTPUT);
+  pinMode(mainPin, OUTPUT);
+  pinMode(beepPin, OUTPUT);
+  
+  softToneCreate(beepPin);
+  
   
 
   //averages an array of points
