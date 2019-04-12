@@ -1,5 +1,5 @@
 
-#include "jimbo.h"
+#include "Jimbo.h"
 
 
 
