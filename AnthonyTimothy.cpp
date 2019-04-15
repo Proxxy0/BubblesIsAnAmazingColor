@@ -99,7 +99,6 @@ float AnthonyTimothy::getFTemp(){
 
 void AnthonyTimothy::gatherThings(){
   file = 0;
-  *bus = "/dev/i2c-1";
   for(int i=0; i<2; i++){
     config[i]=0;
   }
