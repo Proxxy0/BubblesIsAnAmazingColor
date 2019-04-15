@@ -26,25 +26,25 @@ class AnthonyTimothy{
     float pressure;
     
     
-    altMode();
-    altDataReady();
-    altActiveMode();
-    altReadData();
-    altConvertData();
+    void altMode();
+    void altDataReady();
+    void altActiveMode();
+    void altReadData();
+    void altConvertData();
     
-    barMode();
-    barReadData();
-    barConvertData();
+    void barMode();
+    void barReadData();
+    void barConvertData();
     
-    initialize();
+    void initialize();
     
   public:
-    getPres();
-    getAlt();
-    getCTemp();
-    getFTemp();
+    float getPres();
+    float getAlt();
+    float getCTemp();
+    float getFTemp();
     
-    gatherThings();
+    void gatherThings();
     
     AnthonyTimothy();
     ~AnthonyTimothy();

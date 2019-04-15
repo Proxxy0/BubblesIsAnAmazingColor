@@ -2,7 +2,7 @@
 
 using namespace std;
 
-AnthonyTimothy::altMode(){
+void AnthonyTimothy::altMode(){
   // Select control register(0x26)
 	// Active mode, OSR = 128, altimeter mode(0xB9)
   config[0] = 0x26;
@@ -10,7 +10,7 @@ AnthonyTimothy::altMode(){
   write(file, config, 2);
 }
 
-AnthonyTimothy::altDataReady(){
+void AnthonyTimothy::altDataReady(){
   // Select data configuration register(0x13)
   // Data ready event enabled for altitude, pressure, temperature(0x07)
   config[0] = 0x13;
@@ -18,7 +18,7 @@ AnthonyTimothy::altDataReady(){
   write(file, config, 2);
 }
 
-AnthonyTimothy::altActiveMode(){
+void AnthonyTimothy::altActiveMode(){
   // Select control register(0x26)
   // Active mode, OSR = 128, altimeter mode(0xB9)
   config[0] = 0x26;
@@ -27,7 +27,7 @@ AnthonyTimothy::altActiveMode(){
   //sleep(1);
 }
 
-AnthonyTimothy::altReadData(){
+void AnthonyTimothy::altReadData(){
   // Read 6 bytes of data from address 0x00(00)
   // status, tHeight msb1, tHeight msb, tHeight lsb, temp msb, temp lsb
   write(file, reg, 1);
@@ -37,7 +37,7 @@ AnthonyTimothy::altReadData(){
   }
 }
 
-AnthonyTimothy::altConvertData(){
+void AnthonyTimothy::altConvertData(){
   // Convert the data
   tHeight = ((data[1] * 65536) + (data[2] * 256 + (data[3] & 0xF0)) / 16);
   temp = ((data[4] * 256) + (data[5] & 0xF0)) / 16;
@@ -46,7 +46,7 @@ AnthonyTimothy::altConvertData(){
   fTemp = cTemp * 1.8 + 32;
 }
 
-AnthonyTimothy::barMode(){
+void AnthonyTimothy::barMode(){
   // Select control register(0x26)
   // Active mode, OSR = 128, barometer mode(0x39)
   config[0] = 0x26;
@@ -55,7 +55,7 @@ AnthonyTimothy::barMode(){
   //sleep(1);
 }
 
-AnthonyTimothy::barReadData(){
+void AnthonyTimothy::barReadData(){
   // Read 4 bytes of data from register(0x00)
   // status, pres msb1, pres msb, pres lsb
   reg[0] = 0x00;
@@ -63,13 +63,13 @@ AnthonyTimothy::barReadData(){
   read(file, data, 4);
 }
 
-AnthonyTimothy::barConvertData(){
+void AnthonyTimothy::barConvertData(){
   // Convert the data to 20-bits
   int pres = ((data[1] * 65536) + (data[2] * 256 + (data[3] & 0xF0))) / 16;
   float pressure = (pres / 4.0) / 1000.0;
 }
 
-AnthonyTimothy::initialize(){
+void AnthonyTimothy::initialize(){
   // Create I2C bus
   int file;
   char *bus = "/dev/i2c-1";
@@ -81,23 +81,23 @@ AnthonyTimothy::initialize(){
 	ioctl(file, I2C_SLAVE, 0x60);
 }
 
-AnthonyTimothy::getPres(){
+float AnthonyTimothy::getPres(){
   return pressure;
 }
 
-AnthonyTimothy::getAlt(){
+float AnthonyTimothy::getAlt(){
   return altitude;
 }
 
-AnthonyTimothy::getCTemp(){
+float AnthonyTimothy::getCTemp(){
   return cTemp;
 }
 
-AnthonyTimothy::getFTemp(){
+float AnthonyTimothy::getFTemp(){
   return fTemp;
 }
 
-AnthonyTimothy::gatherThings(){
+void AnthonyTimothy::gatherThings(){
   file = null;
   *bus = "/dev/i2c-1";
   for(int i=0; i<2; i++){
