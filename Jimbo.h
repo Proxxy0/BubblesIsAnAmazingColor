@@ -92,16 +92,16 @@ class Jimbo{
   //averaging array
   double avgArray[window] = {0};
 
-  //GPIO pins  
+  //GPIO pins
 
-  
-  
+
+
 
   //averages an array of points
   double average(double *points, int numPnts);
 
   //arming beeps
-  void beep(int freqi, int freqf=0, bool rising = false);
+  void beep(int freqi, double length=0.0, int freqf=0, bool rising = false);
 
   //updates the previous height, vel., accl., and updates their respective values
   // based on average heights and the change in height and velocity respectively

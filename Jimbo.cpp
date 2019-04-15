@@ -19,15 +19,21 @@ double Jimbo::average(double *points, int numPnts){
 }
 
 //unsure what to place here, so currently is used as a placeholder
-void Jimbo::beep(int freqi, int freqf, bool rising){ //beepu
+void Jimbo::beep(int freqi, double length, int freqf, bool rising){ //beepu
   if(rising){
+    int steps = freqf-freqi;
     int i = freqi;
-    
+
     while(i<freqf){
       softToneWrite(beepPin, i);
-      usleep(5000);
+      usleep((int)(length/steps*1000000));
       i++;
     }
+  }
+  else if (length>0){
+    softToneWrite(beepPin, freqi);
+    usleep((int)(length*1000000));
+    softToneWrite(beepPin, 0);
   }
   else{
     softToneWrite(beepPin, freqi);
@@ -194,14 +200,14 @@ void Jimbo::updateAll(){
   setH();
   setV();
   setA();
-  
+
   if(((int)(100*(double)(clock()-totalT)/CLOCKS_PER_SEC))%200==0){
     beep(1500);
   }
   if(((int)(100*(double)(clock()-totalT)/CLOCKS_PER_SEC))%225==0){
     beep(0);
   }
-  
+
 
   if((curV<0) && ((curH-initH)/(maxH-initH) <= drogueLRatio)){
     //fireDrogue(); //removed for testing purposes
@@ -236,15 +242,15 @@ Jimbo::Jimbo(){
 
   file = open(bus, O_RDWR);
   ioctl(file, I2C_SLAVE, 0x60);
-  
+
   wiringPiSetupGpio();
-  
+
   pinMode(droguePin, OUTPUT);
   pinMode(mainPin, OUTPUT);
   pinMode(beepPin, OUTPUT);
-  
+
   softToneCreate(beepPin);
-  
+
 
   for(int i = 0; i<window; i++){
     altimeterGather();
@@ -265,10 +271,9 @@ Jimbo::Jimbo(){
   setH();
   setV();
   setA();
-  
+
   for(int i = 0; i<4; i++){
-      beep(440, 540, true);
-      usleep(500000);
+      beep(440, 0.5, 540, true);
       beep(0);
       usleep(500000);
   }
