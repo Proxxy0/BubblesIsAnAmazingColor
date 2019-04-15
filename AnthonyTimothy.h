@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#define null NULL
+
 using namespace std;
 
 class AnthonyTimothy{
