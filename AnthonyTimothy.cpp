@@ -98,7 +98,7 @@ float AnthonyTimothy::getFTemp(){
 }
 
 void AnthonyTimothy::gatherThings(){
-  file = null;
+  file = 0;
   *bus = "/dev/i2c-1";
   for(int i=0; i<2; i++){
     config[i]=0;
@@ -109,13 +109,13 @@ void AnthonyTimothy::gatherThings(){
   for(int i=0; i<6; i++){
     data[i]=0;
   }
-  tHeight = null;
-  temp = null;
-  altitude = null;
-  cTemp = null;
-  fTemp = null;
-  pres = null;
-  pressure = null;
+  tHeight = 0;
+  temp = 0;
+  altitude = 0;
+  cTemp = 0;
+  fTemp = 0;
+  pres = 0;
+  pressure = 0;
   
   initialize();
   
