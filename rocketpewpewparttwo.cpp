@@ -30,7 +30,7 @@ int main(){
 
   //run for 10 seconds
   while(tonyTim.getTotTime() < 3){
-    cout << tonyTim.getTotTime() << endl;
+   // cout << tonyTim.getTotTime() << endl;
     tonyTim.updateAll();
   }
   tonyTim.endFlight();

@@ -1,8 +1,11 @@
+#!/usr/bin/python
+
 import smbus
 import time
 import numpy as np
 import os
 import RPi.GPIO as GPIO
+from datetime import datetime
 
 clear = lambda: os.system('clear')
 
@@ -12,7 +15,7 @@ GPIO.setup(5, GPIO.OUT)
 GPIO.setup(6, GPIO.OUT)
 GPIO.setup(18, GPIO.OUT)
 
-outputfile = open("outputData.txt","a")
+outputfile = open("/home/pi/Desktop/BubblesIsAnAmazingColor/outputData-{}.txt".format(datetime.now()),"a")
 
 #starttime
 starttime = time.time()
@@ -147,8 +150,8 @@ print("Initial Height:", iH)
 pwm.ChangeFrequency(1500)
 #Go into the main program loop
 beepcount = 0
-#finalcount = 0
-while(True):
+finalcount = 0
+while(finalcount <50):
     
     appendtoCircle(pingAlt(),counter,RHC)
     counter = inc(counter)
@@ -176,7 +179,7 @@ while(True):
         beepcount = 0
     beepcount = beepcount+1
     clear()
- #   finalcount = finalcount+1
+    finalcount = finalcount+1
     
     if(cH < maxH and (cT+5) > maxHT and (cH - iH) > 150):
 	Drogue()
@@ -189,4 +192,5 @@ while(True):
 
     if(mainFlag is 1 and 2 > cV > -2):
 	endflight(outputfile)
-#endflight(outputfile)
+
+endflight(outputfile)
