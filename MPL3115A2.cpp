@@ -57,7 +57,7 @@ int main()
 	}
 
 	// Convert the data
-	int tHeight = ((data[1] * 65536) + (data[2] * 256 + (data[3] & 0xF0)) / 16);
+	int tHeight = ((data[1] * 65536) + (data[2] * 256) + (data[3] & 0xF0)) / 16;
 	int temp = ((data[4] * 256) + (data[5] & 0xF0)) / 16;
 	float altitude = tHeight / 16.0;
 	float cTemp = (temp / 16.0);
